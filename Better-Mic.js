@@ -1,8 +1,14 @@
 // ==UserScript==
 // @name         Chromium Raw / High Quality Microphone
 // @namespace    chaython
-// @version      1.0
+// @version      1.0.1
 // @description  Disable Chromium/WebRTC mic processing and prefer raw 48 kHz audio.
+// @author       Chaython
+// @license      MIT
+// @homepageURL  https://github.com/Chaython/Better-Chrome-Mic-JS
+// @supportURL   https://github.com/Chaython/Better-Chrome-Mic-JS/issues
+// @downloadURL  https://raw.githubusercontent.com/Chaython/Better-Chrome-Mic-JS/main/Better-Mic.js
+// @updateURL    https://raw.githubusercontent.com/Chaython/Better-Chrome-Mic-JS/main/Better-Mic.js
 // @match        *://*/*
 // @run-at       document-start
 // @inject-into  page
