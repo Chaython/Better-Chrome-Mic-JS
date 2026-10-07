@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/microphone.svg" alt="Microphone icon" width="96" height="96">
+</p>
+
 # Better Chrome Mic JS
 
 A lightweight userscript that tries to improve microphone quality in Chromium-based browsers by overriding common WebRTC capture constraints before websites receive your microphone stream.
@@ -17,6 +21,62 @@ Better Chrome Mic JS intercepts browser microphone requests made through `naviga
 - logging the active microphone settings and capabilities to the browser console for troubleshooting.
 
 This can help when a microphone sounds noticeably more muffled, gated, compressed, or unstable in Chromium than it does in the Windows microphone test or native applications.
+
+## Audio chain
+
+The userscript mainly changes the **Chromium capture** stage. Sites can still alter or compress audio later in the WebRTC pipeline.
+
+```mermaid
+flowchart TD
+    A[Microphone] --> B[Chromium capture]
+    B --> B1[Echo cancellation]
+    B --> B2[Noise suppression]
+    B --> B3[Automatic gain control]
+    B --> B4[Sample rate / channel count]
+
+    B1 --> C[WebRTC / MediaRecorder]
+    B2 --> C
+    B3 --> C
+    B4 --> C
+
+    C --> D[Opus encoder]
+    D --> D1[Bitrate]
+    D --> D2[Mono / stereo]
+    D --> D3[DTX]
+    D --> D4[FEC]
+    D --> D5[Site / server settings]
+
+    D1 --> E[Website / voice service / remote listeners]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D5 --> E
+```
+
+In short:
+
+```text
+MICROPHONE
+    ↓
+Chromium capture
+    ├─ Echo cancellation      ← script tries to disable this
+    ├─ Noise suppression      ← script tries to disable this
+    ├─ Auto gain control      ← script tries to disable this
+    └─ channel/sample rate    ← prefers 48 kHz and stereo when supported
+    ↓
+WebRTC / MediaRecorder
+    ↓
+OPUS ENCODER
+    ├─ bitrate
+    ├─ mono/stereo
+    ├─ DTX
+    ├─ FEC
+    └─ site/server settings
+    ↓
+Website / voice service / remote listeners
+```
+
+If `echoCancellation`, `noiseSuppression`, and `autoGainControl` are all reported as `false` but calls still sound poor, the remaining degradation is likely occurring in the later WebRTC/Opus or service-side stages.
 
 ## Installation
 
@@ -78,6 +138,12 @@ If the script appears inactive:
 - confirm the site is using `getUserMedia()` for microphone capture.
 
 If the microphone still sounds poor after the capture settings show the processing options as disabled, the remaining degradation is likely happening later in the site's WebRTC/Opus pipeline rather than during microphone capture.
+
+## Artwork
+
+- `assets/microphone.svg` — Bootstrap Icons `mic` glyph.
+- `assets/microphone.ico` — multi-size ICO derived from the same SVG.
+- Bootstrap Icons is MIT licensed; see [assets/LICENSE-bootstrap-icons.txt](assets/LICENSE-bootstrap-icons.txt).
 
 ## License
 
